@@ -1,3 +1,19 @@
+Proof of concept of facet dive for Etymo, run quickdraw.html as follows:
+
+1)  Install bazel
+
+2)  'bazel build' in same directory as these cloned Repository
+
+3)  'bazel run //facets_dive/demo'
+
+4)  navigate to quickdraw.html file in browser
+
+5) 'bazel clean' to clean up afterwards
+
+
+
+
+
 # Introduction
 
 The facets project contains two visualizations for understanding and analyzing machine learning datasets: Facets Overview and Facets Dive.

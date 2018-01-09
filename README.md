@@ -4,9 +4,9 @@ Proof of concept of facet dive for Etymo, run quickdraw.html as follows:
 
 2)  'bazel build' in same directory as these cloned Repository
 
-3)  'bazel run //facets_dive/demo'
+3)  'bazel run //etymo_example'
 
-4)  navigate to quickdraw.html file in browser
+4)  navigate to test.html file in browser
 
 5) 'bazel clean' to clean up afterwards
 

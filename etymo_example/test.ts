@@ -3,11 +3,31 @@ Proof of concept for Etymo
  */
 import { FacetsDive } from '../facets-dive/components/facets-dive/facets-dive';
 
-import { data } from './dataset1';
+import { data1 } from './dataset1';
+import { data2 } from './dataset2';
+import { data3 } from './dataset3';
 
 const ss = document.querySelector('facets-dive') as FacetsDive;
 
-ss.data = data
+var test1 = data3[0]
+console.log('test1')
+console.log(test1)
+var test2 = test1.nodes
+console.log('test2')
+console.log(test2)
+
+for (var i =0; i< test2.length; i++)
+  {
+    delete test2[i].edges
+    delete test2[i].topic_vector
+    delete test2[i].id
+    delete test2[i].name
+    test2[i].number_of_authors = test2[i].authors.length
+  }
+
+ss.data = test2;
+
+
 
 const PRESET_VIEWS = [
   {
@@ -24,11 +44,37 @@ const PRESET_VIEWS = [
     },
   },
   {
-    description: 'size vs Year',
+    description: 'Size vs Year',
     settings: {
       'verticalFacet': 'size',
       'verticalBuckets': 3,
       'horizontalFacet': 'year',
+      'horizontalBuckets': 25,
+      'positionMode': 'stacked',
+      'verticalPosition': '',
+      'horizontalPosition': '',
+      'colorBy': ''
+    }
+  },
+  {
+    description: 'Author vs Year',
+    settings: {
+      'verticalFacet': 'number_of_authors',
+      'verticalBuckets': 8,
+      'horizontalFacet': 'year',
+      'horizontalBuckets': 25,
+      'positionMode': 'stacked',
+      'verticalPosition': '',
+      'horizontalPosition': '',
+      'colorBy': ''
+    }
+  },
+  {
+    description: 'Size vs Author',
+    settings: {
+      'verticalFacet': 'number_of_authors',
+      'verticalBuckets': 8,
+      'horizontalFacet': 'size',
       'horizontalBuckets': 25,
       'positionMode': 'stacked',
       'verticalPosition': '',

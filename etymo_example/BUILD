@@ -17,7 +17,9 @@ ts_web_library(
         "//facets_dive/components/facets_dive",
         "//facets_dive/lib/test:externs",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:d3",
-        ":dataset1"
+        ":dataset1",
+        ":dataset2",
+        ":dataset3",
     ],
 )
 
@@ -30,10 +32,28 @@ ts_web_library(
     path = "/etymo_example",
 )
 
+ts_web_library(
+    name = "dataset2",
+    srcs = [
+        "dataset2.html",
+        "dataset2.ts",
+    ],
+    path = "/etymo_example",
+)
+
+ts_web_library(
+    name = "dataset3",
+    srcs = [
+        "dataset3.html",
+        "dataset3.ts",
+    ],
+    path = "/etymo_example",
+)
+
 tensorboard_html_binary(
     name = "etymo_example",
     testonly = True,
     input_path = "/etymo_example/test.html",
     output_path = "/etymo_example/test.html",
-    deps = [":test",":dataset1"],
+    deps = [":test",":dataset1",":dataset2",":dataset3"],
 )

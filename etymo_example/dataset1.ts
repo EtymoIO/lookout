@@ -1,5 +1,4 @@
-
-export const data : any = [
+export const data1 : any = [
   {
     "authors": [
       "Mostafa Dehghani",

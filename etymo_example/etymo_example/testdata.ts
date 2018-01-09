@@ -1,5 +1,4 @@
-spaper=
-    {
+  export var data = [{
       "authors": [
         "Mostafa Dehghani",
         "Hamed Zamani",
@@ -125,3 +124,4 @@ spaper=
       "year": "2016"
     }
 }
+]

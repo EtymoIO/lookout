@@ -1,4 +1,2 @@
-First commit after clone from facets: Proof of concept for Etymo
-
-- altered quickdraw examples
-- removed dive controls 
+First commit of lookout.
+  - working example of facet_dive

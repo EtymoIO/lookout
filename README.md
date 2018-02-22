@@ -19,3 +19,12 @@ Working example of Facets Dive using Etymos paper data. See https://pair-code.gi
 5)  navigate to etymo_example/test.html file in browser
 
 6) 'bazel clean' to clean up bazel build files afterwards
+
+
+Graph
+----------
+tsne using sigma animation plugin.
+
+1) Download sigma.js
+
+2) open graph.html

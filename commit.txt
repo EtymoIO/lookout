@@ -1,2 +1,0 @@
-First commit of lookout.
-  - working example of facet_dive

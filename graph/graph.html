@@ -1,0 +1,186 @@
+<!-- START SIGMA IMPORTS -->
+<script src="sigma.js/src/sigma.core.js"></script>
+<script src="sigma.js/src/conrad.js"></script>
+<script src="sigma.js/src/utils/sigma.utils.js"></script>
+<script src="sigma.js/src/utils/sigma.polyfills.js"></script>
+<script src="sigma.js/src/sigma.settings.js"></script>
+<script src="sigma.js/src/classes/sigma.classes.dispatcher.js"></script>
+<script src="sigma.js/src/classes/sigma.classes.configurable.js"></script>
+<script src="sigma.js/src/classes/sigma.classes.graph.js"></script>
+<script src="sigma.js/src/classes/sigma.classes.camera.js"></script>
+<script src="sigma.js/src/classes/sigma.classes.quad.js"></script>
+<script src="sigma.js/src/classes/sigma.classes.edgequad.js"></script>
+<script src="sigma.js/src/captors/sigma.captors.mouse.js"></script>
+<script src="sigma.js/src/captors/sigma.captors.touch.js"></script>
+<script src="sigma.js/src/renderers/sigma.renderers.canvas.js"></script>
+<script src="sigma.js/src/renderers/sigma.renderers.webgl.js"></script>
+<script src="sigma.js/src/renderers/sigma.renderers.svg.js"></script>
+<script src="sigma.js/src/renderers/sigma.renderers.def.js"></script>
+<script src="sigma.js/src/renderers/webgl/sigma.webgl.nodes.def.js"></script>
+<script src="sigma.js/src/renderers/webgl/sigma.webgl.nodes.fast.js"></script>
+<script src="sigma.js/src/renderers/webgl/sigma.webgl.edges.def.js"></script>
+<script src="sigma.js/src/renderers/webgl/sigma.webgl.edges.fast.js"></script>
+<script src="sigma.js/src/renderers/webgl/sigma.webgl.edges.arrow.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.labels.def.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.hovers.def.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.nodes.def.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.edges.def.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.edges.curve.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.edges.arrow.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.edgehovers.def.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.edgehovers.curve.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js"></script>
+<script src="sigma.js/src/renderers/canvas/sigma.canvas.extremities.def.js"></script>
+<script src="sigma.js/src/renderers/svg/sigma.svg.utils.js"></script>
+<script src="sigma.js/src/renderers/svg/sigma.svg.nodes.def.js"></script>
+<script src="sigma.js/src/renderers/svg/sigma.svg.edges.def.js"></script>
+<script src="sigma.js/src/renderers/svg/sigma.svg.edges.curve.js"></script>
+<script src="sigma.js/src/renderers/svg/sigma.svg.labels.def.js"></script>
+<script src="sigma.js/src/renderers/svg/sigma.svg.hovers.def.js"></script>
+<script src="sigma.js/src/middlewares/sigma.middlewares.rescale.js"></script>
+<script src="sigma.js/src/middlewares/sigma.middlewares.copy.js"></script>
+<script src="sigma.js/src/misc/sigma.misc.animation.js"></script>
+<script src="sigma.js/src/misc/sigma.misc.bindEvents.js"></script>
+<script src="sigma.js/src/misc/sigma.misc.bindDOMEvents.js"></script>
+<script src="sigma.js/src/misc/sigma.misc.drawHovers.js"></script>
+<script src="data.js"></script>
+<script src="tsne.js"></script>
+<script src="sigma.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js"></script>
+
+<div id="container">
+  <style>
+    #graph-container {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+    }
+  </style>
+  <div id="graph-container"></div>
+</div>
+<script>
+
+var i,
+    s,
+    o,
+    L = 10, // grid dimensions
+    N = 100, //
+    g = {
+      nodes: [],
+      edges: []
+    },
+    step = 0;
+
+var opt = {}
+opt.epsilon = 10; // epsilon is learning rate (10 = default)
+opt.perplexity = 30; // roughly how many neighbors each point influences (30 = default)
+opt.dim = 2; // dimensionality of the embedding (2 = default)
+
+var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
+
+
+// random initialise tsne
+var gaussRandom = function() {
+  var return_v = false;
+  var v_val = 0.0;
+  if(return_v) {
+    return_v = false;
+    return v_val;
+  }
+  var u = 2*Math.random()-1;
+  var v = 2*Math.random()-1;
+  var r = u*u + v*v;
+  if(r == 0 || r > 1) return gaussRandom();
+  var c = Math.sqrt(-2*Math.log(r)/r);
+  v_val = v*c; // cache this for next function call for efficiency
+  return_v = true;
+  return u*c;
+}
+
+
+
+var randn = function(mu, std){ return mu+gaussRandom()*std; }
+
+var randn2d = function(n,d,s) {
+  var uses = typeof s !== 'undefined';
+  var x = [];
+  for(var i=0;i<n;i++) {
+    var xhere = [];
+    for(var j=0;j<d;j++) {
+      if(uses) {
+        xhere.push(s);
+      } else {
+        xhere.push(randn(0.0, 1e-4));
+      }
+    }
+    x.push(xhere);
+  }
+  return x;
+}
+
+// Generate graph
+for (i = 0; i < N; i++) {
+  o = {
+    id: 'n' + i,
+    label: 'Node ' + i,
+    circular_x: L * Math.cos(Math.PI * 2 * i / N - Math.PI / 2),
+    circular_y: L * Math.sin(Math.PI * 2 * i / N - Math.PI / 2),
+    content1_x: 0,
+    content1_y: 0,
+    content2_x: 0,
+    content2_y: 0,
+    grid_x: i % L,
+    grid_y: Math.floor(i / L),
+    grid_size: 1
+  };
+
+  ['x', 'y', 'size', 'color'].forEach(function(val) {
+    o[val] = o['grid_' + val];
+  });
+  g.nodes.push(o);
+}
+
+// Instantiate sigma:
+s = new sigma({
+  graph: g,
+  container: 'graph-container',
+  settings: {
+    animationsTime: 1000
+  }
+});
+
+var scale = 1000
+var current_node = N
+init_loc = randn2d(current_node, 2); // initiate random positioning
+
+// set off animation
+tsne.initDataRaw(data.slice(0,current_node), init_loc);
+for(var i=0; i<800; i++){
+  tsne.step();
+}
+var Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
+
+for(var i=0; i<N; i++){
+  var nod = s.graph.nodes('n' + i);
+  nod.content1_x = Y[i][0] * scale;
+  nod.content1_y = Y[i][1] * scale;
+  nod.content2_x = 2;
+  nod.content2_y = 2;
+}
+
+
+setInterval(function() {
+  var prefix = ['grid_', 'content1_'][step = +!step];
+  sigma.plugins.animate(
+    s,
+    {
+      x: prefix + 'x',
+      y: prefix + 'y',
+    }
+  );
+}, 2000);
+
+</script>

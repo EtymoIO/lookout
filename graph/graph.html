@@ -60,6 +60,12 @@
     }
   </style>
   <div id="graph-container"></div>
+  <div class="list-group-item">
+  <button class="btn btn-outline-secondary" (click)="toGrid()" title="Grid">Grid</button>
+  <button class="btn btn-outline-secondary" (click)="toV1()" title="Vector1">Vector1</button>
+  <button class="btn btn-outline-secondary" (click)="toV2()" title="Vector2">Vector2</button>
+</div>
+</div>
 </div>
 <script>
 
@@ -79,8 +85,8 @@ opt.epsilon = 10; // epsilon is learning rate (10 = default)
 opt.perplexity = 30; // roughly how many neighbors each point influences (30 = default)
 opt.dim = 2; // dimensionality of the embedding (2 = default)
 
-var tsne = new tsnejs.tSNE(opt); // create a tSNE instance
-
+var tsne1 = new tsnejs.tSNE(opt); // create a tSNE instance
+var tsne2 = new tsnejs.tSNE(opt); // create a tSNE instance
 
 // random initialise tsne
 var gaussRandom = function() {
@@ -148,30 +154,66 @@ s = new sigma({
   graph: g,
   container: 'graph-container',
   settings: {
-    animationsTime: 1000
+    animationsTime: 1000,
   }
 });
 
 var scale = 1000
-var current_node = N
-init_loc = randn2d(current_node, 2); // initiate random positioning
+init_loc = randn2d(N, 2); // initiate random positioning
 
-// set off animation
-tsne.initDataRaw(data.slice(0,current_node), init_loc);
+// Content 1
+tsne1.initDataRaw(data.slice(0,N), init_loc);
 for(var i=0; i<800; i++){
-  tsne.step();
+  tsne1.step();
 }
-var Y = tsne.getSolution(); // Y is an array of 2-D points that you can plot
+var Y1 = tsne1.getSolution(); // Y is an array of 2-D points that you can plot
+
+
+// Content 2
+// set off animation
+tsne2.initDataRaw(data.slice(N+1,2*N), init_loc);
+for(var i=0; i<800; i++){
+  tsne2.step();
+}
+var Y2 = tsne2.getSolution(); // Y is an array of 2-D points that you can plot
 
 for(var i=0; i<N; i++){
   var nod = s.graph.nodes('n' + i);
-  nod.content1_x = Y[i][0] * scale;
-  nod.content1_y = Y[i][1] * scale;
-  nod.content2_x = 2;
-  nod.content2_y = 2;
+  nod.content1_x = Y1[i][0] * scale;
+  nod.content1_y = Y1[i][1] * scale;
+  nod.content2_x = Y2[i][0] * scale;
+  nod.content2_y = Y2[i][0] * scale;
 }
 
 
+function Grid(){
+  sigma.plugins.animate(
+    s,
+    {x: 'grid_x',y: 'grid_y',},
+    {easing: 'quadraticIn',duration: 1000,}
+  );
+}
+
+function toV1(){
+  sigma.plugins.animate(
+    s,
+    {x: 'content1_x',y: 'content1_y',},
+    {easing: 'quadraticIn',duration: 1000,}
+  );
+}
+
+function toV2(){
+  sigma.plugins.animate(
+    s,
+    {x: 'content2_x',y: 'content2_y',},
+    {easing: 'quadraticIn',duration: 1000,}
+  );
+}
+
+
+</script>
+
+<!--
 setInterval(function() {
   var prefix = ['grid_', 'content1_'][step = +!step];
   sigma.plugins.animate(
@@ -179,8 +221,11 @@ setInterval(function() {
     {
       x: prefix + 'x',
       y: prefix + 'y',
+    },
+    {
+    easing: 'quadraticIn',
+    duration: 1000
     }
   );
 }, 2000);
-
-</script>
+-->
